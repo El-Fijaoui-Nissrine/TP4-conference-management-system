@@ -4,7 +4,9 @@ import com.example.conference_service.dto.ConferenceDTO;
 import com.example.conference_service.dto.ReviewDTO;
 import com.example.conference_service.entities.Conference;
 import com.example.conference_service.entities.Review;
+import com.example.conference_service.feign.KeynoteRestClient;
 import com.example.conference_service.mapper.ConferenceMapper;
+import com.example.conference_service.model.KeynoteDTO;
 import com.example.conference_service.repository.ConferenceRepository;
 import com.example.conference_service.repository.ReviewRepository;
 import lombok.AllArgsConstructor;
@@ -21,6 +23,7 @@ public class ConferenceServiceImpl implements ConferenceService{
     private ConferenceMapper conferenceMapper;
     private ConferenceRepository conferenceRepository;
     private ReviewRepository repository;
+    private KeynoteRestClient keynoteRestClient;
     @Override
     public List<ConferenceDTO> conferenceList() {
         return conferenceRepository.findAll()
@@ -77,5 +80,22 @@ public class ConferenceServiceImpl implements ConferenceService{
 
         Review savedReview = repository.save(review);
         return conferenceMapper.fromReview(savedReview);
+    }
+
+    @Override
+    public List<KeynoteDTO> allKeynotesByIDconf(Long confId) {
+        // Récupérer la conférence
+        Conference conference = conferenceRepository.findById(confId)
+                .orElseThrow(() -> new RuntimeException("Conference not found with id: " + confId));
+
+        // Récupérer tous les keynotes disponibles
+        List<KeynoteDTO> allKeynotes = keynoteRestClient.getAllKeynotes();
+
+        // Filtrer pour garder seulement les keynotes associés à cette conférence
+        List<KeynoteDTO> conferenceKeynotes = allKeynotes.stream()
+                .filter(keynote -> conference.getKeynoteIds().contains(keynote.getId()))
+                .collect(Collectors.toList());
+
+        return conferenceKeynotes;
     }
 }

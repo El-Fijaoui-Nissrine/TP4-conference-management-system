@@ -2,6 +2,7 @@ package com.example.conference_service.web;
 
 import com.example.conference_service.dto.ConferenceDTO;
 import com.example.conference_service.dto.ReviewDTO;
+import com.example.conference_service.model.KeynoteDTO;
 import com.example.conference_service.service.ConferenceService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,10 @@ public class ConferenceController {
     @GetMapping("/{id}/reviews")
     public List<ReviewDTO> getReviewsByConference(@PathVariable Long id) {
         return conferenceService.getReviewsByConference(id);
+    }
+    @GetMapping("/{id}/keynotes")
+    public List<KeynoteDTO> getKeynotesByConference(@PathVariable Long id) {
+        return conferenceService.allKeynotesByIDconf(id);
     }
     @PostMapping("/{id}/reviews")
     public ReviewDTO addReview(@PathVariable Long id, @RequestBody ReviewDTO reviewDTO) {

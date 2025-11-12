@@ -1,5 +1,6 @@
 package com.example.conference_service.entities;
 
+import com.example.conference_service.model.KeynoteDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,4 +28,10 @@ public class Conference {
     private Double score;
     @OneToMany(mappedBy = "conference")
     private List<Review> reviews = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "conference_keynotes", joinColumns = @JoinColumn(name = "conference_id"))
+    @Column(name = "keynote_id")
+    private List<Long> keynoteIds = new ArrayList<>();
+
+    @Transient private List<KeynoteDTO> keynotes= new ArrayList<>();
 }

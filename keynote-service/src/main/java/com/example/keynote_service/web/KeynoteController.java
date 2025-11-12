@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/api")
 public class KeynoteController {
     private KeynoteService keynoteService;
     @GetMapping("/keynotes")

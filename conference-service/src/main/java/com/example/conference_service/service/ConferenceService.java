@@ -2,6 +2,7 @@ package com.example.conference_service.service;
 
 import com.example.conference_service.dto.ConferenceDTO;
 import com.example.conference_service.dto.ReviewDTO;
+import com.example.conference_service.model.KeynoteDTO;
 
 import java.util.List;
 
@@ -13,5 +14,6 @@ public interface ConferenceService {
     void deleteConference(Long id);
 List<ReviewDTO> getReviewsByConference(Long idConf);
     ReviewDTO addReview(Long conferenceId, ReviewDTO review);
+   List<KeynoteDTO> allKeynotesByIDconf(Long confId);
 
 }

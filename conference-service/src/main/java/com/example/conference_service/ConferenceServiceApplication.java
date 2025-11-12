@@ -2,16 +2,22 @@ package com.example.conference_service;
 
 import com.example.conference_service.dto.ConferenceDTO;
 import com.example.conference_service.dto.ReviewDTO;
+import com.example.conference_service.feign.KeynoteRestClient;
+import com.example.conference_service.model.KeynoteDTO;
 import com.example.conference_service.service.ConferenceService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @SpringBootApplication
+@EnableFeignClients
+
 public class ConferenceServiceApplication {
 
 	public static void main(String[] args) {
@@ -21,6 +27,7 @@ public class ConferenceServiceApplication {
 	public CommandLineRunner testConferenceService(ConferenceService conferenceService) {
 		return args -> {
 
+
 			ConferenceDTO conf1 = ConferenceDTO.builder()
 					.titre("Spring Boot Workshop")
 					.type("academique")
@@ -28,6 +35,7 @@ public class ConferenceServiceApplication {
 					.duree(120)
 					.nbInscrits(50)
 					.score(4.5)
+					.keynoteIds((new ArrayList<>(List.of(1L, 2L))))
 					.build();
 			ConferenceDTO savConf=conferenceService.saveConference(conf1);
 			ReviewDTO reviewDTO=ReviewDTO.builder()
@@ -43,6 +51,8 @@ public class ConferenceServiceApplication {
 					.duree(220)
 					.nbInscrits(50)
 					.score(2.5)
+					.keynoteIds((new ArrayList<>(List.of(2L))))
+
 					.build();
 			ConferenceDTO savConf2=conferenceService.saveConference(conf2);
 			ReviewDTO reviewDTO2=ReviewDTO.builder()
