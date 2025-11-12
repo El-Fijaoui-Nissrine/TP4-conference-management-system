@@ -3,19 +3,21 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError } from 'rxjs';
 import { Conference, ConferenceDTO, Review } from '../models/conference.model';
 import { Keynote } from '../models/keynote.model';
-
 @Injectable({
   providedIn: 'root'
 })
 export class ConferenceService {
-  private apiUrl = 'http://localhost:8087/api/conferences';
+  // Avant :
+  // private apiUrl = 'http://localhost:8087/api/conferences';
+  // Maintenant via Gateway :
+  private apiUrl = 'http://localhost:8888/conference-service/api/conferences';
 
   constructor(private http: HttpClient) {
-    console.log('🔧 ConferenceService initialized with URL:', this.apiUrl);
+    console.log('🔧 ConferenceService initialized with Gateway URL:', this.apiUrl);
   }
 
   getAllConferences(): Observable<Conference[]> {
-    console.log('🔄 Fetching all conferences from:', this.apiUrl);
+    console.log('🔄 Fetching all conferences via Gateway from:', this.apiUrl);
     return this.http.get<Conference[]>(this.apiUrl).pipe(
       tap(conferences => console.log('✅ Conferences received:', conferences)),
       catchError(error => {
