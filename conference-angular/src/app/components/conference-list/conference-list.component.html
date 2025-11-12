@@ -1,0 +1,133 @@
+<div class="conference-management">
+  <!-- Indicateurs de chargement et d'erreur -->
+  <div *ngIf="isLoading" class="loading">
+    <p>🔄 Chargement des données...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="error">
+    <p>❌ {{ errorMessage }}</p>
+    <button (click)="loadInitialData()">Réessayer</button>
+  </div>
+
+
+
+  <!-- Formulaire d'ajout de conférence -->
+  <div class="form-section" *ngIf="!isLoading">
+    <h3>{{ editingConference ? 'Modifier' : 'Ajouter' }} une Conférence</h3>
+
+    <div *ngIf="allKeynotes.length === 0" class="warning">
+      <p>⚠️ Aucun keynote disponible. Créez d'abord des keynotes.</p>
+    </div>
+
+    <form (ngSubmit)="editingConference ? updateConference() : createConference()" #conferenceForm="ngForm">
+      <input [(ngModel)]="newConference.titre" name="titre" placeholder="Titre" required>
+      <select [(ngModel)]="newConference.type" name="type" required>
+        <option value="">Type de conférence</option>
+        <option value="academique">Académique</option>
+        <option value="commerciale">Commerciale</option>
+      </select>
+      <input [(ngModel)]="newConference.date" name="date" type="date" required>
+      <label>Durée (minutes)</label>
+      <input [(ngModel)]="newConference.duree" name="duree" type="number" placeholder="Durée (minutes)" required>
+      <label>Nombre d'inscrits</label>
+      <input [(ngModel)]="newConference.nbInscrits" name="nbInscrits" type="number" placeholder="Nombre d'inscrits">
+      <label>Score</label>
+
+      <input [(ngModel)]="newConference.score" name="score" type="number" step="0.1" placeholder="Score">
+
+      <div class="keynote-selection" *ngIf="allKeynotes.length > 0">
+        <label>Keynotes associés ({{ selectedKeynoteIds.length }} sélectionné(s)):</label>
+        <div *ngFor="let keynote of allKeynotes" class="checkbox-item">
+          <input type="checkbox"
+                 [value]="keynote.id"
+                 (change)="toggleKeynoteSelection(keynote.id!)"
+                 [checked]="selectedKeynoteIds.includes(keynote.id!)">
+          <span>{{ keynote.prenom }} {{ keynote.nom }} ({{ keynote.fonction }})</span>
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="!conferenceForm.valid || allKeynotes.length === 0">
+        {{ editingConference ? 'Modifier' : 'Ajouter' }}
+      </button>
+      <button type="button" *ngIf="editingConference" (click)="cancelEdit()">Annuler</button>
+    </form>
+  </div>
+
+  <!-- Liste des conférences -->
+  <div class="conferences-section" *ngIf="!isLoading">
+    <h3>Liste des Conférences ({{ conferences.length }})</h3>
+
+    <div *ngIf="conferences.length === 0" class="empty-state">
+      <p>📝 Aucune conférence pour le moment. Créez-en une !</p>
+    </div>
+
+    <div class="conference-grid" *ngIf="conferences.length > 0">
+      <div *ngFor="let conference of conferences" class="conference-card">
+        <div class="conference-header">
+          <h4>{{ conference.titre }}</h4>
+          <div class="conference-actions">
+            <button (click)="editConference(conference)" title="Modifier">✏️</button>
+            <button (click)="deleteConference(conference.id!)" title="Supprimer">🗑️</button>
+            <button (click)="showConferenceDetails(conference)" title="Détails">👁️</button>
+          </div>
+        </div>
+        <p><strong>Type:</strong> {{ conference.type }}</p>
+        <p><strong>Date:</strong> {{ conference.date | date:'dd/MM/yyyy' }}</p>
+        <p><strong>Durée:</strong> {{ conference.duree }} minutes</p>
+        <p><strong>Inscrits:</strong> {{ conference.nbInscrits }}</p>
+        <p><strong>Score:</strong> {{ conference.score }}/5</p>
+        <p><strong>Keynotes:</strong> {{ conference.keynoteIds.length || 0 }}</p>      </div>
+    </div>
+  </div>
+
+  <!-- Détails de la conférence sélectionnée -->
+  <div *ngIf="selectedConference && !isLoading" class="conference-details">
+    <h3>Détails de: {{ selectedConference.titre }}</h3>
+
+    <!-- Keynotes associés -->
+    <div class="details-section">
+      <h4>Keynotes ({{ conferenceKeynotes.length }})</h4>
+      <div *ngIf="conferenceKeynotes.length > 0; else noKeynotes">
+        <div *ngFor="let keynote of conferenceKeynotes" class="keynote-item">
+          <strong>{{ keynote.prenom }} {{ keynote.nom }}</strong> - {{ keynote.fonction }}
+          <br><small>{{ keynote.email }}</small>
+        </div>
+      </div>
+      <ng-template #noKeynotes>
+        <p>Aucun keynote associé à cette conférence</p>
+      </ng-template>
+    </div>
+
+    <!-- Reviews -->
+    <div class="details-section">
+      <h4>Avis ({{ conferenceReviews.length }})</h4>
+      <div *ngIf="conferenceReviews.length > 0; else noReviews">
+        <div *ngFor="let review of conferenceReviews" class="review-item">
+          <p><strong>{{ review.stars }}/5 ⭐</strong> - {{ review.date | date:'dd/MM/yyyy' }}</p>
+          <p>{{ review.texte }}</p>
+        </div>
+      </div>
+      <ng-template #noReviews>
+        <p>Aucun avis pour cette conférence</p>
+      </ng-template>
+
+      <!-- Formulaire d'ajout d'avis -->
+      <div class="add-review">
+        <h5>Ajouter un avis</h5>
+        <form (ngSubmit)="addReview()" #reviewForm="ngForm">
+          <textarea [(ngModel)]="newReview.texte" name="texte" placeholder="Votre avis" required></textarea>
+          <label>Note</label>
+          <select [(ngModel)]="newReview.stars" name="stars" required>
+            <option value="">Note</option>
+            <option value="1">1 ⭐</option>
+            <option value="2">2 ⭐⭐</option>
+            <option value="3">3 ⭐⭐⭐</option>
+            <option value="4">4 ⭐⭐⭐⭐</option>
+            <option value="5">5 ⭐⭐⭐⭐⭐</option>
+          </select>
+          <button type="submit" [disabled]="!reviewForm.valid">Ajouter l'avis</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

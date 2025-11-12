@@ -1,0 +1,35 @@
+<div class="keynote-management">
+  <!-- Formulaire d'ajout/modification -->
+  <div class="form-section">
+    <h3>{{ editingKeynote ? 'Modifier' : 'Ajouter' }} un Keynote</h3>
+    <form (ngSubmit)="editingKeynote ? updateKeynote() : createKeynote()" #keynoteForm="ngForm">
+      <input [(ngModel)]="newKeynote.nom" name="nom" placeholder="Nom" required>
+      <input [(ngModel)]="newKeynote.prenom" name="prenom" placeholder="Prénom" required>
+      <input [(ngModel)]="newKeynote.email" name="email" type="email" placeholder="Email" required>
+      <input [(ngModel)]="newKeynote.fonction" name="fonction" placeholder="Fonction" required>
+
+      <button type="submit" [disabled]="!keynoteForm.valid">
+        {{ editingKeynote ? 'Modifier' : 'Ajouter' }}
+      </button>
+      <button type="button" *ngIf="editingKeynote" (click)="cancelEdit()">Annuler</button>
+    </form>
+  </div>
+
+  <!-- Liste des keynotes -->
+  <div class="keynotes-section">
+    <h3>Liste des Keynotes</h3>
+    <div class="keynote-grid">
+      <div *ngFor="let keynote of keynotes" class="keynote-card">
+        <div class="keynote-header">
+          <h4>{{ keynote.prenom }} {{ keynote.nom }}</h4>
+          <div class="keynote-actions">
+            <button (click)="editKeynote(keynote)">✏️</button>
+            <button (click)="deleteKeynote(keynote.id!)">🗑️</button>
+          </div>
+        </div>
+        <p><strong>Email:</strong> {{ keynote.email }}</p>
+        <p><strong>Fonction:</strong> {{ keynote.fonction }}</p>
+      </div>
+    </div>
+  </div>
+</div>

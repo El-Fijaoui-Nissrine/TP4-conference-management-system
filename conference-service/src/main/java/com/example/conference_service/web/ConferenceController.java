@@ -12,6 +12,8 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/conferences")
+@CrossOrigin(origins = "http://localhost:4200")
+
 public class ConferenceController {
     private ConferenceService conferenceService;
 
