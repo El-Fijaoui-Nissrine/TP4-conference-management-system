@@ -1,6 +1,11 @@
 <div class="keynote-management">
-  <!-- Formulaire d'ajout/modification -->
-  <div class="form-section">
+  <!-- Message d'information sur les permissions -->
+  <div *ngIf="!isAdmin" class="info-banner">
+    <p>ℹ️ Vous consultez en mode lecture seule. Seuls les administrateurs peuvent modifier les données.</p>
+  </div>
+
+  <!-- Formulaire d'ajout/modification (visible uniquement pour les admins) -->
+  <div class="form-section" *ngIf="isAdmin">
     <h3>{{ editingKeynote ? 'Modifier' : 'Ajouter' }} un Keynote</h3>
     <form (ngSubmit)="editingKeynote ? updateKeynote() : createKeynote()" #keynoteForm="ngForm">
       <input [(ngModel)]="newKeynote.nom" name="nom" placeholder="Nom" required>
@@ -17,14 +22,20 @@
 
   <!-- Liste des keynotes -->
   <div class="keynotes-section">
-    <h3>Liste des Keynotes</h3>
-    <div class="keynote-grid">
+    <h3>Liste des Keynotes ({{ keynotes.length }})</h3>
+
+    <div *ngIf="keynotes.length === 0" class="empty-state">
+      <p>📝 Aucun keynote pour le moment.</p>
+      <p *ngIf="isAdmin">Créez-en un !</p>
+    </div>
+
+    <div class="keynote-grid" *ngIf="keynotes.length > 0">
       <div *ngFor="let keynote of keynotes" class="keynote-card">
         <div class="keynote-header">
           <h4>{{ keynote.prenom }} {{ keynote.nom }}</h4>
-          <div class="keynote-actions">
-            <button (click)="editKeynote(keynote)">✏️</button>
-            <button (click)="deleteKeynote(keynote.id!)">🗑️</button>
+          <div class="keynote-actions" *ngIf="isAdmin">
+            <button (click)="editKeynote(keynote)" title="Modifier">✏️</button>
+            <button (click)="deleteKeynote(keynote.id!)" title="Supprimer">🗑️</button>
           </div>
         </div>
         <p><strong>Email:</strong> {{ keynote.email }}</p>

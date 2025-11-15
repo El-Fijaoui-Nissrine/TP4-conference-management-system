@@ -1,0 +1,20 @@
+package com.example.gateway_service.config;
+
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.oauth2.jwt.Jwt;
+import reactor.core.publisher.Mono;
+
+public class JwtAuthConverterReactive implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
+
+    private final JwtAuthConverter delegate;
+
+    public JwtAuthConverterReactive(JwtAuthConverter delegate) {
+        this.delegate = delegate;
+    }
+
+    @Override
+    public Mono<AbstractAuthenticationToken> convert(Jwt jwt) {
+        return Mono.just(delegate.convert(jwt));
+    }
+}

@@ -9,10 +9,13 @@
     <button (click)="loadInitialData()">Réessayer</button>
   </div>
 
+  <!-- Message d'information sur les permissions -->
+  <div *ngIf="!isLoading && !isAdmin" class="info-banner">
+    <p>ℹ️ Vous consultez en mode lecture seule. Seuls les administrateurs peuvent modifier les données.</p>
+  </div>
 
-
-  <!-- Formulaire d'ajout de conférence -->
-  <div class="form-section" *ngIf="!isLoading">
+  <!-- Formulaire d'ajout de conférence (visible uniquement pour les admins) -->
+  <div class="form-section" *ngIf="!isLoading && isAdmin">
     <h3>{{ editingConference ? 'Modifier' : 'Ajouter' }} une Conférence</h3>
 
     <div *ngIf="allKeynotes.length === 0" class="warning">
@@ -32,7 +35,6 @@
       <label>Nombre d'inscrits</label>
       <input [(ngModel)]="newConference.nbInscrits" name="nbInscrits" type="number" placeholder="Nombre d'inscrits">
       <label>Score</label>
-
       <input [(ngModel)]="newConference.score" name="score" type="number" step="0.1" placeholder="Score">
 
       <div class="keynote-selection" *ngIf="allKeynotes.length > 0">
@@ -58,7 +60,8 @@
     <h3>Liste des Conférences ({{ conferences.length }})</h3>
 
     <div *ngIf="conferences.length === 0" class="empty-state">
-      <p>📝 Aucune conférence pour le moment. Créez-en une !</p>
+      <p>📝 Aucune conférence pour le moment.</p>
+      <p *ngIf="isAdmin">Créez-en une !</p>
     </div>
 
     <div class="conference-grid" *ngIf="conferences.length > 0">
@@ -66,9 +69,14 @@
         <div class="conference-header">
           <h4>{{ conference.titre }}</h4>
           <div class="conference-actions">
-            <button (click)="editConference(conference)" title="Modifier">✏️</button>
-            <button (click)="deleteConference(conference.id!)" title="Supprimer">🗑️</button>
-            <button (click)="showConferenceDetails(conference)" title="Détails">👁️</button>
+            <button *ngIf="isAdmin"
+                    (click)="editConference(conference)"
+                    title="Modifier">✏️</button>
+            <button *ngIf="isAdmin"
+                    (click)="deleteConference(conference.id!)"
+                    title="Supprimer">🗑️</button>
+            <button (click)="showConferenceDetails(conference)"
+                    title="Détails">👁️</button>
           </div>
         </div>
         <p><strong>Type:</strong> {{ conference.type }}</p>
@@ -76,7 +84,8 @@
         <p><strong>Durée:</strong> {{ conference.duree }} minutes</p>
         <p><strong>Inscrits:</strong> {{ conference.nbInscrits }}</p>
         <p><strong>Score:</strong> {{ conference.score }}/5</p>
-        <p><strong>Keynotes:</strong> {{ conference.keynoteIds.length || 0 }}</p>      </div>
+        <p><strong>Keynotes:</strong> {{ conference.keynoteIds.length || 0 }}</p>
+      </div>
     </div>
   </div>
 
@@ -111,8 +120,8 @@
         <p>Aucun avis pour cette conférence</p>
       </ng-template>
 
-      <!-- Formulaire d'ajout d'avis -->
-      <div class="add-review">
+      <!-- Formulaire d'ajout d'avis (visible pour tous les utilisateurs connectés) -->
+      <div class="add-review" *ngIf="!isLoading && isAdmin">
         <h5>Ajouter un avis</h5>
         <form (ngSubmit)="addReview()" #reviewForm="ngForm">
           <textarea [(ngModel)]="newReview.texte" name="texte" placeholder="Votre avis" required></textarea>

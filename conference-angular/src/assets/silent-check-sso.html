@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+</head>
+<body>
+<script>
+  // Page vide servant au silentCheckSsoRedirectUri
+  if (window.location.hash && window.parent) {
+    window.parent.postMessage(window.location.hash, window.location.origin);
+  }
+</script>
+</body>
+</html>
